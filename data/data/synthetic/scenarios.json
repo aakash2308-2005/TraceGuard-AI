@@ -1,0 +1,78 @@
+{
+  "description": "Synthetic investigation scenarios with known ground truth for evaluation (docs/EVALUATION.md). All data is fabricated; no real individuals, domains, or wallets.",
+  "disclaimer": "These values are illustrative test fixtures. example.com/example.org and RFC-5737/3849 reserved ranges are used where possible.",
+  "scenarios": [
+    {
+      "id": "S1-genuine-link",
+      "title": "Genuine coordinated activity",
+      "description": "Indicators that genuinely relate to one actor.",
+      "indicators": [
+        { "type": "domain", "value": "acme-phish-demo.example.com" },
+        { "type": "email", "value": "operator@acme-phish-demo.example.com" },
+        { "type": "wallet", "value": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }
+      ],
+      "ground_truth": {
+        "expected_relationships": [
+          ["operator@acme-phish-demo.example.com", "acme-phish-demo.example.com"]
+        ],
+        "expected_contradictions": ["open_question:wallet-attribution-unverified"],
+        "is_genuine_link": true
+      }
+    },
+    {
+      "id": "S2-coincidental-shared-ip",
+      "title": "Coincidental shared IP (false lead)",
+      "description": "Two unrelated indicators share one IP (VPN exit). Defense Agent should flag this.",
+      "indicators": [
+        { "type": "ip", "value": "198.51.100.23" },
+        { "type": "domain", "value": "unrelated-blog.example.org" },
+        { "type": "username", "value": "unrelated_user" }
+      ],
+      "ground_truth": {
+        "expected_relationships": [],
+        "expected_contradictions": ["plausible_alternative:shared-vpn-exit"],
+        "is_genuine_link": false
+      }
+    },
+    {
+      "id": "S3-conflicting-timestamps",
+      "title": "Conflicting timestamps",
+      "description": "File metadata timestamps conflict with claimed activity window.",
+      "indicators": [
+        { "type": "domain", "value": "timeline-conflict.example.com" }
+      ],
+      "files": [
+        { "filename": "evidence_photo.jpg", "note": "crafted EXIF with future DateTimeOriginal" }
+      ],
+      "ground_truth": {
+        "expected_contradictions": ["open_question:metadata-timestamp-conflict"],
+        "is_genuine_link": false
+      }
+    },
+    {
+      "id": "S4-insufficient-evidence",
+      "title": "Insufficient evidence",
+      "description": "A single uncorroborated indicator; the engine must return insufficient.",
+      "indicators": [
+        { "type": "username", "value": "lonely_handle" }
+      ],
+      "ground_truth": {
+        "expected_confidence_band": "insufficient",
+        "is_genuine_link": null
+      }
+    },
+    {
+      "id": "S5-blockchain-no-attribution",
+      "title": "Blockchain transfer without identity attribution",
+      "description": "On-chain transfers are observable but ownership is unproven.",
+      "indicators": [
+        { "type": "wallet", "value": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" }
+      ],
+      "ground_truth": {
+        "expected_relationships": ["wallet-counterparty-association"],
+        "expected_contradictions": ["open_question:on-chain-not-ownership"],
+        "is_genuine_link": null
+      }
+    }
+  ]
+}
