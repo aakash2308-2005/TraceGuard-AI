@@ -1,0 +1,4 @@
+Contact alice@example.com
+username: shadowfox
+Server 203.0.113.7
+Visit portal.evil-corp.net
